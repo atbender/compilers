@@ -1,11 +1,12 @@
 DIGITO	[0-9]
 LETRA	[a-zA-Z]
-PALAVRAS_RESERVADAS (public|class|\{|static|void|main|String|return|int|boolean|if|else|while|System.out.println|length|true|false|this|new)
+PALAVRAS_RESERVADAS (public|class|static|void|main|String|return|int|boolean|if|else|while|System.out.println|length|true|false|this|new)
 
 MISC (\(|\[|\]|\)|\{|\}|\;|\,|\.|!)
 ID	{LETRA}({LETRA}|{DIGITO}|_)*
 OP 	(&&|<|[+]|-|[*]|=)	
 COMMENT (\/\*)(.)*(\*\/)|(\/\/)(.)*
+LIXO (\ )*|(\t)*|(\n)*
 
 %%
 
@@ -15,6 +16,7 @@ COMMENT (\/\*)(.)*(\*\/)|(\/\/)(.)*
 {PALAVRAS_RESERVADAS}	{printf("Palavra Reservada: %s\n",yytext);}
 {ID}					{printf("Identificador: %s\n",yytext);}
 {COMMENT}				{printf("Comentario: %s\n",yytext);}
+{LIXO}                  {} 
 
 %%
 
