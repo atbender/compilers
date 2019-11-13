@@ -1,0 +1,199 @@
+PARSER_BEGIN(Karloff)
+import java.io.*;
+public class Karloff {
+
+  public static void main(String args[]) throws ParseException,IOException {
+    Karloff parser = new Karloff(new FileInputStream(args[0]));
+    parser.Karloff();
+  }
+}
+
+PARSER_END(Karloff)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+TOKEN :
+{
+  <MAIN: "main">
+| <ACHAVES: "{">
+| <FCHAVES: "}">
+| <VOID: "void">
+| <NEWVAR: "newVar">
+| <PV: ";">
+| <TIPO: "int"|"bool">
+| <OPENPAR: "(">
+| <CLOSEPAR: ")">
+| <IF: "if">
+| <THEN: "then">
+| <WHILE: "while">
+| <REPEAT: "repeat">
+| <UNTIL: "until">
+| <RETURN: "return">
+| <SYSTEMOUTPUT: "System.output">
+| <TRUE: "true">
+| <FALSE: "false">
+| <FUNC: "func">
+}
+
+TOKEN :
+{
+  <#CHAR: ["a"-"z", "A"-"Z"]>
+| <#DIGIT: ["0"-"9"]>
+| <NUM: (<DIGIT>)+>
+| <#FACAO_OPCIONAL: ("."(<NUM>))?>
+| <#EXP_OPCIONAL: ("E"("+"|"-")? (<NUM>))?>
+| <#CHARORDIGIT: (<CHAR> | <DIGIT>)>
+| <#FINALSUBLINHADO: ("_"(<CHARORDIGIT>)+)>
+| <TOKEN_ID: ((<CHAR>)(<CHARORDIGIT>)*(<FINALSUBLINHADO>)*)>
+| <TOKEN_NUMLITERAL: (<NUM>)(<FACAO_OPCIONAL>)(<EXP_OPCIONAL>)>
+| <OP: "+"|"-"|"*"|"/"|"&"|"|"|"<"|">"|"==">
+}
+
+
+
+void Karloff () :{}
+{ 
+  Main() 
+  SeqFunc()
+  <EOF> 
+}
+
+void VarDecl():{}
+{
+  (<NEWVAR> <TIPO> <TOKEN_ID> <PV>)*
+}
+
+void SeqCommands():{}
+{
+  (Command() SeqCommands())?
+}
+
+void Atrib():{}
+{
+  <TOKEN_ID> "=" Exp() <PV>
+}
+
+void ChamadaFunc():{}
+{
+  <TOKEN_ID> <OPENPAR> ListaExp() <CLOSEPAR> <PV>
+}
+
+void IfThen():{}
+{
+  <IF> <OPENPAR> Exp() <CLOSEPAR>
+    <THEN> <ACHAVES> SeqCommands() <FCHAVES> <PV>
+}
+
+void While():{}
+{
+  <WHILE> <OPENPAR> Exp() <CLOSEPAR>
+    <ACHAVES> SeqCommands() <FCHAVES> <PV>
+}
+
+void Repeat():{}
+{
+  <REPEAT> <ACHAVES>
+    SeqCommands()
+  <FCHAVES> <UNTIL> <OPENPAR> Exp() <CLOSEPAR> <PV>
+}
+
+void Output():{}
+{
+  <SYSTEMOUTPUT> <OPENPAR> Exp() <CLOSEPAR> <PV>
+}
+
+void ListaExp():{}
+{
+  Exp() ListaExp1()
+}
+
+void ListaExp1():{}
+{
+  (","ListaExp())?
+}
+
+void Exp ():{}
+{
+  Fator() Exp1()
+}
+
+void Exp1():{}
+{
+  (<OP> Exp())?
+}
+
+void Return():{}
+{
+  <RETURN> Exp() <PV>
+}
+
+void Command():{}
+{
+  LOOKAHEAD(2)
+  Atrib() 
+  | ChamadaFunc()
+  | IfThen()
+  | While()
+  | Repeat()
+  | Return()
+  | Output()
+}
+
+void Fator():{}
+{
+  LOOKAHEAD(2)
+    <TOKEN_ID> <OPENPAR> ListaExp() <CLOSEPAR>
+  | <TOKEN_ID>
+  | <NUM>
+  | <TRUE>
+  | <FALSE>
+}
+
+void Arg():{}
+{
+  <TIPO> <TOKEN_ID>
+}
+
+void ListaArgs():{}
+{
+   (Arg() ListaArgs1())?
+}
+
+void ListaArgs1():{}
+{
+  (","ListaArgs())?
+}
+
+void Func():{}
+{
+  <FUNC> <TIPO> <TOKEN_ID> <OPENPAR> ListaArgs() <CLOSEPAR> <ACHAVES>
+    VarDecl()
+    SeqCommands()
+  <FCHAVES>
+}
+
+void SeqFunc():{}
+{
+  (Func() SeqFunc())? 
+}
+
+
+void Main ():{}
+{
+ <VOID> <MAIN> <ACHAVES>
+ VarDecl()
+ SeqCommands()
+ <FCHAVES>
+
+}
+
+
+
+
+

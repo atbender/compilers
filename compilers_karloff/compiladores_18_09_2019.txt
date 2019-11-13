@@ -1,0 +1,41 @@
+compiladores 18/09/2019
+
+
+prática de análise sintática:
+
+Trabalho 3 - implementar um parser para a linguagem karloff usando a ferramenta javacc. Também fazer 3 exemplos de programas em karloff.
+
+
+	- gerador automático de parsers
+	- javacc
+
+	> javacc Karloff.jj
+	gerar um parser escrito em java para a linguagem karloff
+	> javac *.java
+	> java Karloff arquivo.k
+
+	- basicamente pegar a gramática e passar para o formato Karloff.jj
+
+
+
+
+			====DICAS DE JAVACC :D====
+	---------------
+	vazio:
+	A->B|&			para javacc:			A->B|?
+	---------------
+	remover recursão à esquerda:
+	A->AB|C   		A'->CA'
+					A'->(BA')?
+	---------------
+	A->AB|&			A->B*
+	---------------
+	fatoração:
+	A->aB|aC   		CHOICE CONFLICT			A->A'
+											A'->B|C
+
+
+
+
+
+
